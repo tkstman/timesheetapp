@@ -1,6 +1,11 @@
 <?php
 // Start the session
 session_start();
+if(isset($_SESSION['ulogin']))
+{
+  header('location: dashboard.php?u='.$_SESSION['ulogin']);
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -64,7 +69,7 @@ session_start();
         var rgx = new RegExp("^[^a-zA-Z0-9]+$")
         if(rgx.test(username.value.trim()))
         {
-          throw "Invalid Username Supplied!";
+          throw "Invalid Username Format Supplied!";
         }
 
         /**
@@ -83,10 +88,14 @@ session_start();
           {
             if(xmlhttp.responseText.trim() == "login_failed")
             {
-               throw "Failed To Validate User!";
+              var error = document.getElementById("error");
+              error.innerHTML  = "Failed To Validate User!";
             }
             else {
-              window.location = "dashboard.php?u="ajax.responseText.trim();
+
+              //alert(xmlhttp.responseText.trim());
+
+              window.location = "dashboard.php?u="+ajax.responseText.trim();
             }
           }
 
@@ -98,12 +107,11 @@ session_start();
       }
       catch(err)
       {
-        document.getElementById("error").innerHTML ="Frank";
          var error = document.getElementById("error");
          error.innerHTML  = err;
-         this.disabled = false;
-      }
 
+      }
+      this.disabled = false;
 
     };
 
