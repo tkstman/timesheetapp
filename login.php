@@ -1,8 +1,8 @@
 <?php
 session_start();
-if(isset($_SESSION['login']))
+if(isset($_SESSION['ulogin']))
 {
-  header('location: dashboard.php?u='.$_SESSION['login']);
+  header('location: dashboard.php?u='.$_SESSION['ulogin']);
 }
 
 
