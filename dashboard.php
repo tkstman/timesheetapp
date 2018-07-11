@@ -103,11 +103,26 @@ if($user_query = $connx->query($sql))
 </body>
 <script>
 
-
+var jsobject=0;
 var oldColor, oldText, padTop, padBottom= "";
 
 function endEdit(input) {
 	var td = input.parentNode;
+	td.removeChild(td.firstChild);	//remove input
+	td.innerHTML = input.value;
+	if (oldText != input.value.trim() )
+		td.style.color = "red";
+
+	// td.style.paddingTop = padTop;
+	// td.style.paddingBottom = padBottom;
+	// td.style.backgroundColor = oldColor;
+}
+
+function endDrop(input) {
+	var td = input.parentNode;
+	
+	var option = document.createElement("option");
+	
 	td.removeChild(td.firstChild);	//remove input
 	td.innerHTML = input.value;
 	if (oldText != input.value.trim() )
@@ -146,18 +161,56 @@ function makeEditableDrop(ev)
 
   oldText= this.innerHTML.trim();
 
-  var input = document.createElement("SELECT");
-	input.value = oldText;
-  input.className ="";
+  var dropdown = document.createElement("SELECT");
+  var option = document.createElement("option");
+  dropdown.value = oldText;
+  dropdown.className ="";
   this.innerHTML="";
-  this.insertBefore(input,this.childNodes[0]);
-  input.onblur = function () { endEdit(this); };
-  input.select();
+  this.insertBefore(dropdown,this.childNodes[0]);
+  dropdown.onblur = function () { endDrop(this); };
+  dropdown.focus();
 }
 
 window.onload = function(){
  var tds = document.getElementsByTagName("td");
  var y=0;
+ 
+ /**
+	Since No Errors Were Thrown, We Initiate Ajax Request To Server To Validate User
+	**/
+	var xmlhttp;
+	if (window.XMLHttpRequest) {
+		xmlhttp = new XMLHttpRequest();
+	 } else {
+		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+
+	xmlhttp.onreadystatechange = function()
+	{
+	  if(xmlhttp.readyState == 4 && xmlhttp.status ==200)
+	  {
+		if(xmlhttp.responseText.trim() == "No_Res")
+		{
+			alert("hiyo");
+		  //var error = document.getElementById("error");
+		  //error.innerHTML  = "No Clients Available!";
+		}
+		else {
+		  jsobject = JSON.parse(xmlhttp.responseText.trim());
+		  //alert("me");
+		  console.log(jsobject);
+		  
+		  //alert(xmlhttp.responseText.trim());
+
+		  //window.location = "dashboard.php?u="+xmlhttp.responseText.trim();
+		}
+	  }
+
+	}
+	xmlhttp.open("GET","includes/query.php?clients=get_all",true);
+	xmlhttp.send();
+
+ 
  for(var x=0; x<tds.length; x++)
  {
    if(y!=7)
@@ -179,8 +232,8 @@ window.onload = function(){
      y=0;
    }
  }
- console.log(tds);
- }
+ 
+}
 </script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 <style>

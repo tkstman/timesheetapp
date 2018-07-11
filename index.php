@@ -95,7 +95,7 @@ if(isset($_SESSION['ulogin']))
 
               //alert(xmlhttp.responseText.trim());
 
-              window.location = "dashboard.php?u="+ajax.responseText.trim();
+              window.location = "dashboard.php?u="+xmlhttp.responseText.trim();
             }
           }
 
