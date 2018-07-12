@@ -44,9 +44,14 @@ if($user_query = $connx->query($sql))
   <style>
     td,th {
       width:152px!important;
-      padding-left:0px!important;
+      /* padding-left:0px!important; */
       /* padding-right:0px!important; */
     }
+	
+	.editable
+	{
+		background-color: rgba(150, 150, 150, 0.19);
+	}
 
     .myselect-control
     {
@@ -411,9 +416,10 @@ if($user_query = $connx->query($sql))
     {
       if(xmlhttp.readyState == 4 && xmlhttp.status ==200)
       {
-        if(xmlhttp.responseText.trim() == "_failed")
+        if(xmlhttp.responseText.trim() == "Successful Entry!")
         {
           alert(xmlhttp.responseText.trim());
+		  location.refresh();
           // var error = document.getElementById("error");
           // error.innerHTML  = "Failed To Validate User!";
         }
@@ -456,6 +462,7 @@ if($user_query = $connx->query($sql))
     		  //error.innerHTML  = "No Clients Available!";
     		}
     		else {
+				//alert(xmlhttp.responseText.trim());
     		  jsobject = JSON.parse(xmlhttp.responseText.trim());
     		}
   	  }
@@ -473,21 +480,26 @@ if($user_query = $connx->query($sql))
        if(y==1)
        {
          tds[x].addEventListener("click", makeEditableDrop);
+		 tds[x].title+="CLICK TO EDIT";
        }
        else if(y==2){
          tds[x].addEventListener("click", makeEditableDateInput);
+		 tds[x].title+=" CLICK TO EDIT";
        }
        else if(y==3 ){
           tds[x].addEventListener("click", makeEditableStartTimeInput);
+		  tds[x].title+=" CLICK TO EDIT";
        }
        else if(y==4 ){
           tds[x].addEventListener("click", makeEditableEndTimeInput);
+		  tds[x].title+=" CLICK TO EDIT";
        }
        else if (y==5){
 
        }
        else {
          tds[x].addEventListener("click", makeEditableInput);
+		 tds[x].title+=" CLICK TO EDIT";
        }
 
        y++;
@@ -530,76 +542,45 @@ if($user_query = $connx->query($sql))
         </thead>
         <tbody>
           <?php
-              $sqlTask = "select * from task";
+		  
+              $sqlTask = "select * from task where user_id=(?)";
             //
 
-            if($task_user_query = $connx->query($sqlTask))
+            if($task_user_stamt = $connx->prepare($sqlTask))
             {
-              $task_num_rows = $task_user_query->num_rows;
-
-              if($task_num_rows <1)
-              {
-
-              }
-              else
-              {
-                $task_rows = array();
-                while ($task_row = $task_user_query->fetch_assoc()) {
-                  $task_rows[] = $task_row;
-                }
-                echo json_encode($task_rows);
-                mysqli_close($connx);
-                exit();
-              }
-
-              echo '<tr>
-                <th scope="row">1</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><input type="submit" class="save-btn" data-value="new" value="Save"/></td>
-              </tr>';
-              exit();
-
+			    $task_user_stamt->bind_param("i",$user_id);
+			    if($task_user_stamt->execute())
+			    {
+					$task_result= $task_user_stamt->get_result();
+					  
+					while ($task_row = $task_result->fetch_assoc()) {
+						foreach ($task_row as $r){
+							print "$r";
+						}
+			  		}
+			  		
+			  		  // mysqli_close($connx);
+			  		  // exit();
+			  	    // }
+                    
+			  	    echo '<tr>
+			  		  <th scope="row">1</th>
+			  		  <td></td>
+			  		  <td></td>
+			  		  <td></td>
+			  		  <td></td>
+			  		  <td></td>
+			  		  <td></td>
+			  		  <td></td>
+			  		  <td><input type="submit" class="save-btn" data-value="new" value="Save"/></td>
+			  	    </tr>';
+			  	    exit();
+			    }
              }
+			 echo "this";
+		  exit();
           ?>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td data-value="2">Otto</td>
-            <td >2014-09-02</td>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td>@twitter</td>
-            <td><input type="submit" class"save-btn" value="Save"/></td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td data-value="2">Thornton</td>
-            <td>2014-09-02</td>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td>@twitter</td>
-            <td><input type="submit" class"save-btn" value="Save"/></td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td>Larry</td>
-            <td data-value="2">the Bird</td>
-            <td>2014-09-02</td>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-            <td>@twitter</td>
-            <td><input type="submit" class"save-btn" value="Save"/></td>
-          </tr>
+          
 
          </tbody>
        </table>

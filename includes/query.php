@@ -35,17 +35,94 @@ if(isset($_GET["clients"]))
 }
 
 if(isset($_POST["comment"   ])&&
-  isset($_POST["total_time"])&&
-  isset($_POST["end_time"  ])&&
-  isset($_POST["start_time"])&&
-  isset($_POST["date"      ])&&
-  isset($_POST["client"    ])&&
-  isset($_POST["client_val"])&&
-  isset($_POST["task"      ])&&
-  isset($_POST["status"    ])
+   isset($_POST["total_time"])&&
+   isset($_POST["end_time"  ])&&
+   isset($_POST["start_time"])&&
+   isset($_POST["date"      ])&&
+   isset($_POST["client"    ])&&
+   isset($_POST["client_val"])&&
+   isset($_POST["task"      ])&&
+   isset($_POST["status"    ])
 )
 {
-  echo"all were sent";
+	
+	$comment    = mysqli_real_escape_string($connx,$_POST["comment"   ]);
+	$total_time = mysqli_real_escape_string($connx,$_POST["total_time"]);
+	$end_time   = mysqli_real_escape_string($connx,$_POST["end_time"  ]);
+	$start_time = mysqli_real_escape_string($connx,$_POST["start_time"]);
+	$date       = mysqli_real_escape_string($connx,$_POST["date"      ]);
+	$client     = mysqli_real_escape_string($connx,$_POST["client"    ]);
+	$client_val = mysqli_real_escape_string($connx,$_POST["client_val"]);
+	$task       = mysqli_real_escape_string($connx,$_POST["task"      ]);
+	$status      =mysqli_real_escape_string($connx,$_POST["status"    ]);
+	
+	$timeFormat = "/^([0-9]{2})\:([0-9]{2})$/";
+    $clientFormat = "/^\d+$/";
+    $dateFormat = "/^\d{4}\-\d{1,2}\-\d{1,2}$/";
+	
+	$sqlTasking="";
+	$statTask="";
+
+    if($user_id=="" || $comment==""|| $total_time=="" || $end_time=="" || $start_time=="" || $date=="" || $client=="" || $task=="" || $client_val=="")
+    {
+      echo "Task Values Must Be Entered Before Saving! Please Try Again";
+      exit();
+    }
+
+    if(preg_match($timeFormat,$end_time) == false || preg_match($timeFormat,$start_time) == false)
+    {
+        echo"Invalid Time Format! Please Try Again";
+        exit();
+    }
+
+    if(!preg_match($clientFormat,$client_val))
+    {
+      echo "Invalid Client Info! Please Reload And Resubmit";
+      exit();
+    }
+
+    if($status=="new" ||$status=="old")
+    {
+		if($status=="new")
+		{
+			$sqlTasking="insert into task (name,client_id,user_id,start_date,start_time,end_time,comments) values (?,?,?,?,?,?,?)";
+			$statTask =$connx->prepare($sqlTasking);
+			$statTask->bind_param("siissss",$task ,$client_val,$user_id,$date ,$start_time,$end_time ,$comment ); 
+		}
+		else
+		{
+			if(isset($_POST["status"    ]))
+			{
+				$task_id  = mysqli_real_escape_string($_POST["task_id"    ]);
+				$sqlTasking="update task set name=((?),client_id=(?),user_id=(?)),start_date=(?),start_time=(?),end_time=(?)),comments=(?) where task.id=(?)";
+				$statTask = $connx->prepare($sqlTasking);
+				$statTask->bind_param("siissssi",$task ,$client_val,$date ,$start_time,$end_time ,$comment,$task_id ); 
+			}
+		}
+    }
+    else {
+      echo "Invalid Input! Please Resubmit";
+      exit();
+    }
+
+    if(!preg_match($dateFormat,$date))
+    {
+      echo "Invalid Date! Please Resubmit";
+      exit();
+    }
+	
+	 
+	
+	if($statTask->execute())
+	{
+		$statTask->store_result();
+		if($statTask->affected_rows >0)
+		{
+			echo "Successful Entry!";
+			exit();
+		}
+	}
+  echo "all were sent";
   exit();
   // $getClients = preg_replace('#[^a-z0-9_]#i','',$_GET["clients"]);
   //
