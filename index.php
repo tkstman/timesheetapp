@@ -11,27 +11,78 @@ if(isset($_SESSION['ulogin']))
 <html>
 <head>
   <meta charset="utf-8" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  
+  <style>
+    td,th {
+      width:152px!important;
+      /* padding-left:0px!important; */
+      /* padding-right:0px!important; */
+    }
+	
+	.editable
+	{
+		background-color: rgba(150, 150, 150, 0.19);
+	}
 
+    .myselect-control
+    {
+      display: block;
+      font-size: 1rem;
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: .25rem;
+      transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+
+    }
+	#navbarSupportedContent
+	{
+		display: block!important;
+	}
+	.navbar-nav.navbar-right
+	{
+		float: right!important;
+		position: relative!important;
+	}
+	.bg-light 
+	{
+		background-color: #346ba2!important;
+	}
+	.login-container
+	{
+		margin-top:10px;
+	}
+	#submitBtn
+	{
+		margin-top:10px;
+	}
+	</style>
 </head>
 <body>
   <div id="container" class="container">
+	<div style="margin-top: 20px;">
+		<h2>Time Sheet App: Sign in</h2>
+	</div>
     <div class="login-container">
-      <form id="login_form" method="post" action="login.php">
+      <form id="login_form" method="post" action="login.php" class="form-control">
         <div>
           <p id="error" class="text-danger">
 
           </p>
         </div>
         <div>
-          <label for="username">Username:</label>
-          <input name="username" id="username" type="text">
+          <label for="username" >Username:</label>
+          <input name="username" id="username" type="text" class="form-control">
         </div>
         <div>
           <label for="password">Password:</label>
-          <input name="password" id="password" type="password">
+          <input name="password" id="password" type="password" class="form-control">
         </div>
         <div>
-          <input type="submit" id="submitBtn">
+          <input type="submit" id="submitBtn" >
         </div>
       </form>
     </div>

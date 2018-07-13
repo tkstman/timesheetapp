@@ -27,12 +27,6 @@ if($user_query = $connx->query($sql))
   {
     $isOwner ="yes";
   }
-
-  //GET THE USER'S INFORMATION
-  while ($row = mysqli_fetch_array($user_query,MYSQLI_ASSOC))
-  {
-
-  }
 }
 
 ?>
@@ -41,6 +35,8 @@ if($user_query = $connx->query($sql))
 <html>
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  
   <style>
     td,th {
       width:152px!important;
@@ -65,6 +61,23 @@ if($user_query = $connx->query($sql))
       transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 
     }
+	#navbarSupportedContent
+	{
+		display: block!important;
+	}
+	.navbar-nav.navbar-right
+	{
+		float: right!important;
+		position: relative!important;
+	}
+	.bg-light 
+	{
+		background-color: #346ba2!important;
+	}
+	.login-container
+	{
+		margin-top:10px;
+	}
   </style>
   <script>
 
@@ -75,7 +88,7 @@ if($user_query = $connx->query($sql))
   function checkUpdateTotalTime(source,sourceParent)
   {
     var tDay = new Date();
-    console.log(sourceParent.innerHTML.trim());
+    //console.log(sourceParent.innerHTML.trim());
     //console.log(sourceParent.nextSibling.nextSibling.innerHTML.trim());
     // if(sourceParent.innerHTML.trim() !=="")
     // {
@@ -86,38 +99,53 @@ if($user_query = $connx->query($sql))
         var s = new Date(tDay.toDateString() +" " + starttemp); //THE OTHER TABLE CELL'S VALUE AS DATE
         var ec = new Date(tDay.toDateString() +" " + sourceParent.innerHTML.trim());  //THE CURRENT TABLE CELL'S VALUE
 
-        if(s=="Invalid Date" || ec=="Invalid Date")
+        if(s=="Invalid Date" || ec=="Invalid Date" || s>ec)
         {
           alert("Invalid Date Range");
+		  sourceParent.innerHTML="";
+		  sourceParent.nextSibling.nextSibling.innerHTML="";
           return;
         }
-        console.log(sourceParent.nextSibling.nextSibling.innerHTML.trim());
+        //console.log(sourceParent.nextSibling.nextSibling.innerHTML.trim());
 
         var sh =s.getHours();
         var sm =s.getMinutes();
         var ech =ec.getHours();
         var ecm =ec.getMinutes();
-        var resultHour = ech-sh;
-        var resultMins = ecm-sm;
-        console.log("Hours sh "+ (sh));
-        console.log("Hours ech "+ (ech));
-        console.log("Hours "+ (ech-sh));
-        sourceParent.nextSibling.nextSibling.innerHTML=resultHour+" hours "+ resultMins+" mins";
+		
+		var resultHour = ech-sh;		
+		var resultMins = "";
+		if(ecm-sm>=0)
+		{
+			console.log(ecm-sm);
+			resultMins=ecm-sm;
+		}
+		else{
+			resultMins=60+(ecm-sm);
+			resultHour=resultHour-1;
+		}
+        
+
+        // console.log("Hours sh "+ (sh));
+        // console.log("Hours ech "+ (ech));
+        // console.log("Hours "+ (ech-sh));
+        sourceParent.nextSibling.nextSibling.innerHTML=resultHour+" Hrs "+ resultMins+" Mins";
         //check if value is in correct date format
       }
       else if(source.name=="start_time" && sourceParent.innerHTML.trim()!==""  && sourceParent.nextSibling.nextSibling.innerHTML.trim() !=="")
       {
-        console.log("get the value of the end time");
         var endtemp = sourceParent.nextSibling.nextSibling.innerHTML.trim();
         var ec = new Date(tDay.toDateString() +" " + endtemp); //THE OTHER TABLE CELL'S VALUE AS DATE
         var s = new Date(tDay.toDateString() +" " + sourceParent.innerHTML.trim());  //THE CURRENT TABLE CELL'S VALUE Start Time
 
-        if(s=="Invalid Date" || ec=="Invalid Date")
+        if(s=="Invalid Date" || ec=="Invalid Date" || s>ec)
         {
           alert("Invalid Date Range");
+		  sourceParent.innerHTML="";
+		  sourceParent.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML="";
           return;
         }
-        console.log(sourceParent.nextSibling.nextSibling.innerHTML.trim());
+        //console.log(sourceParent.nextSibling.nextSibling.innerHTML.trim());
 
         var sh =s.getHours();
         var sm =s.getMinutes();
@@ -125,18 +153,14 @@ if($user_query = $connx->query($sql))
         var ecm =ec.getMinutes();
         var resultHour = ech-sh;
         var resultMins = ecm-sm;
-        console.log("Hours sh "+ (sh));
-        console.log("Hours ech "+ (ech));
-        console.log("Hours "+ (ech-sh));
+        // console.log("Hours sh "+ (sh));
+        // console.log("Hours ech "+ (ech));
+        // console.log("Hours "+ (ech-sh));
         sourceParent.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML=resultHour+" hours "+ resultMins+" mins";
-        console.log(endtemp);
+        // console.log(endtemp);
         //check if value is in correct date format
       }
 
-      //t = tDay.toDateString() +" " + source.value;
-      //console.log(sourceParent.innerHTML.trim());
-
-    // }
   }
 
   /*
@@ -249,7 +273,7 @@ if($user_query = $connx->query($sql))
   }
 
   /*
-  MAKE TABLE CELL INTO EDITABLE DATE INPUT ELEMENTS
+  MAKE TABLE CELL INTO EDITABLE STARTTIME INPUT ELEMENTS
   */
   function makeEditableStartTimeInput(ev)
   {
@@ -273,7 +297,7 @@ if($user_query = $connx->query($sql))
   }
 
   /*
-  MAKE TABLE CELL INTO EDITABLE DATE INPUT ELEMENTS
+  MAKE TABLE CELL INTO EDITABLE ENDTIME INPUT ELEMENTS
   */
   function makeEditableEndTimeInput(ev)
   {
@@ -350,6 +374,7 @@ if($user_query = $connx->query($sql))
     var start_time = this.parentNode.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.innerHTML.trim();
     var date       = this.parentNode.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.innerHTML.trim();
     var client     = this.parentNode.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.innerHTML.trim();
+	console.log(this.parentNode.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.getAttribute("data-value"));
     var client_val = this.parentNode.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.getAttribute("data-value").trim();
     var task       = this.parentNode.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.innerHTML.trim();
     var state = this.getAttribute("data-value").trim();
@@ -411,6 +436,17 @@ if($user_query = $connx->query($sql))
     data.append( "client_val",client_val    );
     data.append( "task"      ,task        );
     data.append( "status"    ,status      );
+	if(status=="old")
+	{
+		var task_id       = this.parentNode.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.innerHTML.trim();
+		console.log(task_id + " task id");
+		if(!clientFormat.test(task_id))
+		{
+		  alert("Invalid Task Info! Please Reload And Resubmit");
+		  return;
+		}
+		data.append("task_id",task_id);
+	}
 
     xmlhttp.onreadystatechange = function()
     {
@@ -419,7 +455,7 @@ if($user_query = $connx->query($sql))
         if(xmlhttp.responseText.trim() == "Successful Entry!")
         {
           alert(xmlhttp.responseText.trim());
-		  location.refresh();
+		  location.reload();
           // var error = document.getElementById("error");
           // error.innerHTML  = "Failed To Validate User!";
         }
@@ -522,10 +558,102 @@ if($user_query = $connx->query($sql))
   </script>
 </head>
 <body>
-  <div id=container>
+  <div id=container>	
     <div>
+		<header>
+			<nav class="navbar navbar-expand-lg navbar-light bg-light navbar-fixed-top">
+			  <a class="navbar-brand" href="#" >Time Sheet App</a>
+			  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			  </button>
 
+			  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav navbar-right">
+					<li class="nav-item">
+					 <?php 
+						if($user_id=="")
+						{
+							echo '<a class="nav-link" href="index.php">Login<span class="sr-only">(current)</span></a>';
+							
+						}
+						else{
+						   echo '<a class="nav-link" href="logout.php">Logout <span class="sr-only"></span></a>';
+						}
+							   
+					  ?>
+					  </li> 
+				  </ul>
+			  </div>
+			</nav>
+		</header>
     </div>
+	
+	<div id="user-details">   
+	<?php
+		$sqlUser = "SELECT employee_manager.`manager_id`, employee.*, job_role.name FROM `employee_manager` INNER JOIN employee ON `employee_manager`.employee_id=employee.id INNER JOIN job_role ON employee.position =job_role.id where employee.id=(?)";
+            
+            if($user_stamt = $connx->prepare($sqlUser))
+            {
+				
+			    $user_stamt->bind_param("i",$user_id);
+			    if($user_stamt->execute())
+			    {					
+					$user_result= $user_stamt->get_result();
+					$man_id="";
+					while ($user_row = $user_result->fetch_array()) 
+					{
+						$man_id=$user_row[0];
+						echo '<div class="col-sm-6" style="float: left;">
+								<div class="card">
+									<div class="card-body">
+										<h5 class="card-title">'. $user_row[9].'</h5>
+										<p class="card-text">'.$user_row[4].' '.$user_row[5].'</p>				
+									</div>
+								</div>
+							</div>'.
+							
+							'<div class="col-sm-6" style="float: left;">
+								<div class="card">
+									<div class="card-body">
+										<h5 class="card-title">ADDRESS</h5>
+										<p class="card-text">'.$user_row[7].'</p>				
+									</div>
+								</div>
+							</div>'
+							
+							;
+			  		}
+					
+					$sqlMang = "Select first_name,last_name from employee where employee.id=(?)";
+					if($man_stamt = $connx->prepare($sqlMang))
+					{
+						$man_stamt->bind_param("i",$man_id);
+						if($man_stamt->execute())
+						{
+							$man_result= $man_stamt->get_result();
+							while($man_row = $man_result->fetch_array())
+							{
+								echo '<div class="col-sm-6" style="float: left;">
+										<div class="card">
+											<div class="card-body">
+												<h5 class="card-title">REPORTING MANAGER</h5>
+												<p class="card-text">'.$man_row[0].' '.$man_row[1].'</p>				
+											</div>
+										</div>
+									</div>';
+							}
+						}
+					}
+			  		                    
+			  	    //echo 'something odd occurred';
+			  	    //exit();
+			    }
+            }
+	?>
+		
+	</div>
+	
+	
     <div>
       <table class="table table-striped table-dark">
         <thead>
@@ -543,28 +671,35 @@ if($user_query = $connx->query($sql))
         <tbody>
           <?php
 		  
-              $sqlTask = "select * from task where user_id=(?)";
-            //
-
+            $sqlTask = "SELECT task.*, employee.*, client.* FROM task INNER JOIN employee ON task.user_id=employee.id INNER JOIN client ON task.client_id=client.id where task.user_id=(?)";
+            
             if($task_user_stamt = $connx->prepare($sqlTask))
             {
+				
 			    $task_user_stamt->bind_param("i",$user_id);
 			    if($task_user_stamt->execute())
-			    {
+			    {					
 					$task_result= $task_user_stamt->get_result();
-					  
-					while ($task_row = $task_result->fetch_assoc()) {
-						foreach ($task_row as $r){
-							print "$r";
-						}
+					
+					while ($task_row = $task_result->fetch_array()) {
+					$bval = new Datetime($task_row[5]); //start time;
+					 $xval=	new Datetime($task_row[6]); //end time;
+					   
+						echo '<tr>
+			  		  <th scope="row">'.$task_row[0].'</th>
+			  		  <td>'.$task_row[1].'</td>
+			  		  <td data-value='.$task_row[2].'>'.$task_row[17].'</td>
+			  		  <td>'.$task_row[4].'</td>
+			  		  <td>'.substr($task_row[5],0,5).'</td>
+			  		  <td>'.substr($task_row[6],0,5).'</td>
+			  		  <td>'.$xval->diff($bval)->format("%h Hrs %i Mins").'</td>
+			  		  <td>'.$task_row[7].'</td>
+			  		  <td><input type="submit" class="save-btn" data-value="old" value="Save"/></td>
+			  	    </tr>';						
 			  		}
-			  		
-			  		  // mysqli_close($connx);
-			  		  // exit();
-			  	    // }
-                    
+			  		                    
 			  	    echo '<tr>
-			  		  <th scope="row">1</th>
+			  		  <th scope="row">+</th>
 			  		  <td></td>
 			  		  <td></td>
 			  		  <td></td>
@@ -576,9 +711,7 @@ if($user_query = $connx->query($sql))
 			  	    </tr>';
 			  	    exit();
 			    }
-             }
-			 echo "this";
-		  exit();
+            }
           ?>
           
 

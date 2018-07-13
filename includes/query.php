@@ -34,6 +34,26 @@ if(isset($_GET["clients"]))
    }
 }
 
+function checkForValidTask($cnx, $tsk_id)
+{
+	$checkersql_tsk = "SELECT id FROM task WHERE id=(?)";
+	$tsk_rt="";
+        if($statement_ts = $cnx->prepare($checkersql_tsk))
+        {
+
+          $statement_ts->bind_param("i",$tsk_id);
+          $statement_ts->execute();
+          $statement_ts->bind_result($tsk_rt);
+          $statement_ts->fetch();
+
+          if($tsk_rt!=0 && $tsk_rt>0 && $tsk_rt!= "")
+          {
+            return true;
+          }
+        }
+        return false;
+}
+
 if(isset($_POST["comment"   ])&&
    isset($_POST["total_time"])&&
    isset($_POST["end_time"  ])&&
@@ -55,6 +75,7 @@ if(isset($_POST["comment"   ])&&
 	$client_val = mysqli_real_escape_string($connx,$_POST["client_val"]);
 	$task       = mysqli_real_escape_string($connx,$_POST["task"      ]);
 	$status      =mysqli_real_escape_string($connx,$_POST["status"    ]);
+	
 	
 	$timeFormat = "/^([0-9]{2})\:([0-9]{2})$/";
     $clientFormat = "/^\d+$/";
@@ -93,10 +114,17 @@ if(isset($_POST["comment"   ])&&
 		{
 			if(isset($_POST["status"    ]))
 			{
-				$task_id  = mysqli_real_escape_string($_POST["task_id"    ]);
-				$sqlTasking="update task set name=((?),client_id=(?),user_id=(?)),start_date=(?),start_time=(?),end_time=(?)),comments=(?) where task.id=(?)";
+				$task_id  = mysqli_real_escape_string($connx,$_POST["task_id"    ]);
+				if(!checkForValidTask($connx,$task_id))
+				{
+					echo "Invalid Task Info";
+					exit();
+				}
+				
+				
+				$sqlTasking="update task set name=?,client_id=?,user_id=?,start_date=?,start_time=?,end_time=?,comments=? where task.id=?";
 				$statTask = $connx->prepare($sqlTasking);
-				$statTask->bind_param("siissssi",$task ,$client_val,$date ,$start_time,$end_time ,$comment,$task_id ); 
+				$statTask->bind_param("siissssi",$task ,$client_val,$user_id,$date ,$start_time,$end_time ,$comment,$task_id ); 
 			}
 		}
     }
